@@ -20,3 +20,11 @@ public protocol WhereRouter {
     func `where`(_ expression: ExpressionProtocol) -> Where
     
 }
+
+extension WhereRouter {
+    
+    public func `where`(_ expression: ExpressionProtocol) -> Where {
+        return QueryWhere(query: self as! BaseQuery, impl: expression.toImpl())
+    }
+    
+}

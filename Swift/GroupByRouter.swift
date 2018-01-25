@@ -18,3 +18,12 @@ public protocol GroupByRouter {
     func groupBy(_ expressions: ExpressionProtocol...) -> GroupBy
     
 }
+
+extension GroupByRouter {
+    
+    func groupBy(_ expressions: ExpressionProtocol...) -> GroupBy {
+        return QueryGroupBy(query: self as! BaseQuery,
+                            impl: QueryExpression.toImpl(expressions: expressions))
+    }
+    
+}

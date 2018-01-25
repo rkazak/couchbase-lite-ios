@@ -19,3 +19,12 @@ public protocol JoinRouter {
     func join(_ join: JoinProtocol...) -> Joins
     
 }
+
+extension JoinRouter {
+    
+    func join(_ joins: JoinProtocol...) -> Joins {
+        return QueryJoins(query: self as! BaseQuery,
+                          impl: QueryJoin.toImpl(joins: joins))
+    }
+    
+}

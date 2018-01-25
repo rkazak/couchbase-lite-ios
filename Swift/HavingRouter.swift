@@ -20,3 +20,11 @@ public protocol HavingRouter {
     func having(_ expression: ExpressionProtocol) -> Having
     
 }
+
+extension HavingRouter {
+    
+    func having(_ expression: ExpressionProtocol) -> Having {
+        return QueryHaving(query: self as! BaseQuery, impl: expression.toImpl())
+    }
+    
+}

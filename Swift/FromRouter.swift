@@ -20,4 +20,12 @@ public protocol FromRouter {
     
 }
 
-
+extension FromRouter {
+    
+    func from(_ dataSource: DataSourceProtocol) -> From {
+        return QueryFrom(query: self as! BaseQuery,
+                         impl: dataSource.toImpl(),
+                         database: dataSource.source() as! Database);
+    }
+    
+}

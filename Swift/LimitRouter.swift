@@ -29,3 +29,15 @@ public protocol LimitRouter {
     func limit(_ limit: ExpressionProtocol, offset: ExpressionProtocol?) -> Limit
     
 }
+
+extension LimitRouter {
+    
+    func limit(_ limit: ExpressionProtocol) -> Limit {
+        return self.limit(limit, offset: nil)
+    }
+    
+    func limit(_ limit: ExpressionProtocol, offset: ExpressionProtocol?) -> Limit {
+        return QueryLimit(query: self as! BaseQuery, limit: limit, offset: offset)
+    }
+    
+}

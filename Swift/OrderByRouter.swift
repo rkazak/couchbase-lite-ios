@@ -18,3 +18,12 @@ public protocol OrderByRouter {
     /// - Returns: The OrderBy object that represents the ORDER BY clause of the query.
     func orderBy(_ orderings: OrderingProtocol...) -> OrderBy
 }
+
+extension OrderByRouter {
+    
+    func orderBy(_ orderings: OrderingProtocol...) -> OrderBy {
+        return QueryOrderBy(query: self as! BaseQuery,
+                            impl: QueryOrdering.toImpl(orderings: orderings))
+    }
+    
+}
