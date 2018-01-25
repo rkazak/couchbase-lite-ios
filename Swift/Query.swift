@@ -9,9 +9,79 @@
 import Foundation
 
 
+public protocol QueryProtocol {
+    
+    /// Returns the Parameters object used for setting values to the query parameters defined
+    /// in the query. All parameters defined in the query must be given values
+    /// before running the query, or the query will fail.
+    var parameters: Parameters? { get set }
+    
+    /// Executes the query. The returning an enumerator that returns result rows one at a time.
+    /// You can run the query any number of times, and you can even have multiple enumerators active
+    /// at once.
+    ///
+    /// The results come from a snapshot of the database taken at the moment -run: is called, so they
+    /// will not reflect any changes made to the database afterwards.
+    ///
+    /// - Returns: The ResultSet object representing the query result.
+    /// - Throws: An error on failure, or if the query is invalid.
+    func execute() throws -> ResultSet
+    
+    /// Returns a string describing the implementation of the compiled query.
+    /// This is intended to be read by a developer for purposes of optimizing the query, especially
+    /// to add database indexes. It's not machine-readable and its format may change.
+    ///
+    /// As currently implemented, the result is two or more lines separated by newline characters:
+    /// * The first line is the SQLite SELECT statement.
+    /// * The subsequent lines are the output of SQLite's "EXPLAIN QUERY PLAN" command applied to that
+    /// statement; for help interpreting this, see https://www.sqlite.org/eqp.html . The most
+    /// important thing to know is that if you see "SCAN TABLE", it means that SQLite is doing a
+    /// slow linear scan of the documents instead of using an index.
+    ///
+    /// - Returns: The implementation detail of the compiled query.
+    /// - Throws: An error if the query is not valid.
+    func explain() throws -> String
+    
+    /// Adds a query change listener. Changes will be posted on the main queue.
+    ///
+    /// - Parameter listener: The listener to post changes.
+    /// - Returns: An opaque listener token object for removing the listener.
+    @discardableResult func addChangeListener(_ listener: @escaping (QueryChange) -> Void) -> ListenerToken
+    
+    /// Removes a change listener wih the given listener token.
+    ///
+    /// - Parameter token: The listener token.
+    func removeChangeListener(withToken token: ListenerToken)
+    
+}
+
+
 /// A database query.
 /// A Query instance can be constructed by calling one of the select class methods.
 public class Query {
+    
+    /// Create a SELECT statement instance that you can use further
+    /// (e.g. calling the from() function) to construct the complete query statement.
+    ///
+    /// - Parameter results: The array of the SelectResult object for specifying the returned values.
+    /// - Returns: A Select object.
+    public static func select(_ results: SelectResultProtocol...) -> Select {
+        return QuerySelect(impl: QuerySelectResult.toImpl(results: results), distinct: false)
+    }
+    
+    
+    /// Create a SELECT DISTINCT statement instance that you can use further
+    /// (e.g. calling the from() function) to construct the complete query statement.
+    ///
+    /// - Parameter results: The array of the SelectResult object for specifying the returned values.
+    /// - Returns: A Select distinct object.
+    public static func selectDistinct(_ results: SelectResultProtocol...) -> Select {
+        return QuerySelect(impl: QuerySelectResult.toImpl(results: results), distinct: true)
+    }
+    
+}
+
+class BaseQuery: QueryProtocol {
     
     /// Returns the Parameters object used for setting values to the query parameters defined
     /// in the query. All parameters defined in the query must be given values
@@ -23,28 +93,8 @@ public class Query {
     }
     
     
-    /// Create a SELECT statement instance that you can use further
-    /// (e.g. calling the from() function) to construct the complete query statement.
-    ///
-    /// - Parameter results: The array of the SelectResult object for specifying the returned values.
-    /// - Returns: A Select object.
-    public static func select(_ results: SelectResultProtocol...) -> Select {
-        return Select(impl: QuerySelectResult.toImpl(results: results), distinct: false)
-    }
-    
-    
-    /// Create a SELECT DISTINCT statement instance that you can use further
-    /// (e.g. calling the from() function) to construct the complete query statement.
-    ///
-    /// - Parameter results: The array of the SelectResult object for specifying the returned values.
-    /// - Returns: A Select distinct object.
-    public static func selectDistinct(_ results: SelectResultProtocol...) -> Select {
-        return Select(impl: QuerySelectResult.toImpl(results: results), distinct: true)
-    }
-    
-
     /// Executes the query. The returning an enumerator that returns result rows one at a time.
-    /// You can run the query any number of times, and you can even have multiple enumerators active 
+    /// You can run the query any number of times, and you can even have multiple enumerators active
     /// at once.
     ///
     /// The results come from a snapshot of the database taken at the moment -run: is called, so they
@@ -96,7 +146,7 @@ public class Query {
     ///   - listener: The listener to post changes.
     /// - Returns: An opaque listener token object for removing the listener.
     @discardableResult public func addChangeListener(withQueue queue: DispatchQueue?,
-        _ listener: @escaping (QueryChange) -> Void) -> ListenerToken {
+                                                     _ listener: @escaping (QueryChange) -> Void) -> ListenerToken {
         lock.lock()
         defer {
             lock.unlock()
@@ -136,7 +186,7 @@ public class Query {
         }
         lock.unlock()
     }
-
+    
     // MARK: Internal
     
     var selectImpl: [CBLQuerySelectResult]?
@@ -215,8 +265,8 @@ public class Query {
         tokens.removeAllObjects()
         lock.unlock()
     }
-
-    func copy(_ query: Query) {
+    
+    func copy(_ query: BaseQuery) {
         self.database = query.database
         self.selectImpl = query.selectImpl
         self.distinct = query.distinct
@@ -232,7 +282,7 @@ public class Query {
 }
 
 
-extension Query: CustomStringConvertible {
+extension BaseQuery: CustomStringConvertible {
     
     public var description: String {
         prepareQuery()

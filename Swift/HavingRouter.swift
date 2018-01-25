@@ -10,7 +10,7 @@ import Foundation
 
 
 /// HavingRouter for creating and chaning a query HAVING clause.
-protocol HavingRouter {
+public protocol HavingRouter {
     
     /// Creates and chain a Having object for filtering the aggregated values
     /// from the the GROUP BY clause.

@@ -9,15 +9,19 @@
 import Foundation
 
 
+public protocol Joins: QueryProtocol, WhereRouter, OrderByRouter, LimitRouter  {
+    
+}
+
 /// A Joins component represents a collection of the joins clauses of the query statement.
-public final class Joins: Query, WhereRouter, OrderByRouter, LimitRouter {
+class QueryJoins: BaseQuery, Joins {
     
     /// Creates and chains a Where object for specifying the WHERE clause of the query.
     ///
     /// - Parameter expression: The where expression.
     /// - Returns: The Where object that represents the WHERE clause of the query.
     public func `where`(_ expression: ExpressionProtocol) -> Where {
-        return Where(query: self, impl: expression.toImpl())
+        return QueryWhere(query: self, impl: expression.toImpl())
     }
     
     
@@ -26,7 +30,7 @@ public final class Joins: Query, WhereRouter, OrderByRouter, LimitRouter {
     /// - Parameter orderings: The Ordering objects.
     /// - Returns: The OrderBy object that represents the ORDER BY clause of the query.
     public func orderBy(_ orderings: OrderingProtocol...) -> OrderBy {
-        return OrderBy(query: self, impl: QueryOrdering.toImpl(orderings: orderings))
+        return QueryOrderBy(query: self, impl: QueryOrdering.toImpl(orderings: orderings))
     }
     
     
@@ -47,14 +51,14 @@ public final class Joins: Query, WhereRouter, OrderByRouter, LimitRouter {
     ///   - offset: The offset expression.
     /// - Returns: The Limit object that represents the LIMIT clause of the query.
     public func limit(_ limit: ExpressionProtocol, offset: ExpressionProtocol?) -> Limit {
-        return Limit(query: self, limit: limit, offset: offset)
+        return QueryLimit(query: self, limit: limit, offset: offset)
     }
     
     
     // MARK: Internal
     
     
-    init(query: Query, impl: [CBLQueryJoin]) {
+    init(query: BaseQuery, impl: [CBLQueryJoin]) {
         super.init()
         self.copy(query)
         self.joinsImpl = impl

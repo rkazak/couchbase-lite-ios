@@ -14,7 +14,7 @@ import Foundation
 public struct QueryChange {
     
     /// The source live query object.
-    public let query: Query
+    public let query: QueryProtocol
     
     /// The new query result.
     public let results: ResultSet?

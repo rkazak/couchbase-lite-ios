@@ -8,13 +8,16 @@
 
 import Foundation
 
+public protocol Limit: QueryProtocol {
+    
+}
 
 /// A Limit component represents the LIMIT clause of the query statement.
-public final class Limit: Query  {
+class QueryLimit: BaseQuery, Limit  {
     
     // MARK: Internal
     
-    init(query: Query, limit: ExpressionProtocol, offset: ExpressionProtocol?) {
+    init(query: BaseQuery, limit: ExpressionProtocol, offset: ExpressionProtocol?) {
         super.init()
         
         self.copy(query)

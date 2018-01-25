@@ -8,15 +8,20 @@
 
 import Foundation
 
+
+public protocol Where: QueryProtocol, GroupByRouter, OrderByRouter, LimitRouter {
+    
+}
+
 /// Where class represents the WHERE clause of the query statement.
-public final class Where: Query, GroupByRouter, OrderByRouter, LimitRouter {
+class QueryWhere: BaseQuery, Where {
     
     /// Create and chain an ORDER BY component for specifying the orderings of the query result.
     ///
     /// - Parameter orderings: The ordering objects.
     /// - Returns: The OrderBy object.
     public func orderBy(_ orderings: OrderingProtocol...) -> OrderBy {
-        return OrderBy(query: self, impl: QueryOrdering.toImpl(orderings: orderings))
+        return QueryOrderBy(query: self, impl: QueryOrdering.toImpl(orderings: orderings))
     }
     
     
@@ -25,7 +30,7 @@ public final class Where: Query, GroupByRouter, OrderByRouter, LimitRouter {
     /// - Parameter expressions: The expression objects.
     /// - Returns: The GroupBy object.
     public func groupBy(_ expressions: ExpressionProtocol...) -> GroupBy {
-        return GroupBy(query: self, impl: QueryExpression.toImpl(expressions: expressions))
+        return QueryGroupBy(query: self, impl: QueryExpression.toImpl(expressions: expressions))
     }
     
     
@@ -46,12 +51,12 @@ public final class Where: Query, GroupByRouter, OrderByRouter, LimitRouter {
     ///   - offset: The offset Expression object or liternal value.
     /// - Returns: The Limit object.
     public func limit(_ limit: ExpressionProtocol, offset: ExpressionProtocol?) -> Limit {
-        return Limit(query: self, limit: limit, offset: offset)
+        return QueryLimit(query: self, limit: limit, offset: offset)
     }
     
     
     /// An internal constructor.
-    init(query: Query, impl: CBLQueryExpression) {
+    init(query: BaseQuery, impl: CBLQueryExpression) {
         super.init()
         
         self.copy(query)

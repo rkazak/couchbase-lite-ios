@@ -9,8 +9,12 @@
 import Foundation
 
 
+public protocol OrderBy: QueryProtocol, LimitRouter {
+    
+}
+
 /// An OrderBy represents an ORDER BY clause of the query statement.
-public final class OrderBy: Query, LimitRouter {
+class QueryOrderBy: BaseQuery, OrderBy {
     
     /// Creates and chains a Limit object to limit the number query results.
     ///
@@ -29,12 +33,12 @@ public final class OrderBy: Query, LimitRouter {
     ///   - offset: The offset expression.
     /// - Returns: The Limit object that represents the LIMIT clause of the query.
     public func limit(_ limit: ExpressionProtocol, offset: ExpressionProtocol?) -> Limit {
-        return Limit(query: self, limit: limit, offset: offset)
+        return QueryLimit(query: self, limit: limit, offset: offset)
     }
     
     // MARK: Internal
     
-    init(query: Query, impl: [CBLQueryOrdering]) {
+    init(query: BaseQuery, impl: [CBLQueryOrdering]) {
         super.init()
         self.copy(query)
         self.orderingsImpl = impl

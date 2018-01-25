@@ -9,7 +9,7 @@
 import Foundation
 
 /// GroupByRouter for creating and chaning a query GROUP BY clause.
-protocol GroupByRouter {
+public protocol GroupByRouter {
     
     /// Creates and chains a GroupBy object to group the query result.
     ///

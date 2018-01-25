@@ -311,14 +311,14 @@ public final class Database {
     }
     
     
-    func addQuery(_ query: Query) {
+    func addQuery(_ query: QueryProtocol) {
         _lock.lock()
         _activeQueries.add(query)
         _lock.unlock()
     }
     
     
-    func removeQuery(_ query: Query) {
+    func removeQuery(_ query: QueryProtocol) {
         _lock.lock()
         _activeQueries.remove(query)
         _lock.unlock()
@@ -328,7 +328,7 @@ public final class Database {
     private func stopActiveQueries() {
         _lock.lock()
         for query in _activeQueries.allObjects {
-            (query as! Query).stop()
+            (query as! BaseQuery).stop()
         }
         _lock.unlock()
     }

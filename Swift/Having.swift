@@ -9,16 +9,20 @@
 import Foundation
 
 
+public protocol Having: QueryProtocol, OrderByRouter, LimitRouter {
+    
+}
+
 /// Having represents a HAVING clause of the query statement used for filtering the aggregated 
 /// values from the the GROUP BY clause.
-public final class Having: Query, OrderByRouter, LimitRouter {
+class QueryHaving: BaseQuery, Having {
     
     /// Creates and chains an OrderBy object for specifying the orderings of the query result.
     ///
     /// - Parameter orderings: The Ordering objects.
     /// - Returns: The OrderBy object that represents the ORDER BY clause of the query.
     public func orderBy(_ orderings: OrderingProtocol...) -> OrderBy {
-        return OrderBy(query: self, impl: QueryOrdering.toImpl(orderings: orderings))
+        return QueryOrderBy(query: self, impl: QueryOrdering.toImpl(orderings: orderings))
     }
     
     
@@ -39,14 +43,14 @@ public final class Having: Query, OrderByRouter, LimitRouter {
     ///   - offset: The offset expression.
     /// - Returns: The Limit object that represents the LIMIT clause of the query.
     public func limit(_ limit: ExpressionProtocol, offset: ExpressionProtocol?) -> Limit {
-        return Limit(query: self, limit: limit, offset: offset)
+        return QueryLimit(query: self, limit: limit, offset: offset)
     }
     
     
     // MARK: Internal
     
     
-    init(query: Query, impl: CBLQueryExpression) {
+    init(query: BaseQuery, impl: CBLQueryExpression) {
         super.init()
         
         self.copy(query)

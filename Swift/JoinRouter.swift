@@ -10,7 +10,7 @@ import Foundation
 
 
 /// JoinRouter for creating and chaning he JOIN components to specify a query JOIN clause.
-protocol JoinRouter {
+public protocol JoinRouter {
     
     /// Create and chain the JOIN components to specify a query JOIN clause.
     ///

@@ -10,7 +10,7 @@ import Foundation
 
 
 /// WhereRouter for creating and chaning a query WHERE clause.
-protocol WhereRouter {
+public protocol WhereRouter {
     
     /// Create and chain a WHERE clause component to specify a query WHERE clause
     /// used for filtering the query result.

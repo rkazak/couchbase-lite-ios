@@ -14,7 +14,7 @@ class QueryTest: CBLTestCase {
     
     let kSEQUENCE = SelectResult.expression(Meta.sequence)
     
-    func verifyQuery(_ query: Query, block: (UInt64, Result) throws ->Void) throws -> UInt64 {
+    func verifyQuery(_ query: QueryProtocol, block: (UInt64, Result) throws ->Void) throws -> UInt64 {
         var n: UInt64 = 0
         for row in try query.execute() {
             n += 1
@@ -435,7 +435,7 @@ class QueryTest: CBLTestCase {
         let PARAM_N1 = Expression.parameter("num1")
         let PARAM_N2 = Expression.parameter("num2")
         
-        let q = Query
+        var q = Query
             .select(SelectResult.expression(NUMBER1))
             .from(DataSource.database(db))
             .where(NUMBER1.between(PARAM_N1, and: PARAM_N2))

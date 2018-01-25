@@ -10,7 +10,7 @@ import Foundation
 
 
 /// OrderByRouter for creating and chaning a query ORDER BY clause.
-protocol OrderByRouter {
+public protocol OrderByRouter {
     
     /// Creates and chains an OrderBy object for specifying the orderings of the query result.
     ///
