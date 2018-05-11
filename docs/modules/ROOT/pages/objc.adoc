@@ -16,7 +16,7 @@ using one of the following methods.
 
 ==== Frameworks
 
-* Download the latest link:../../whatsnew.html[developer build].
+* https://www.couchbase.com/downloads[Download] Couchbase Lite.
 * Drag *CouchbaseLite.framework* from your Finder to the Xcode
 navigator.
 * Click on Project > General > Embedded Binary and add
